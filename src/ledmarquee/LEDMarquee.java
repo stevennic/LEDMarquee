@@ -3,7 +3,7 @@ import processing.core.*;
 public class LEDMarquee extends PApplet {
 	//Global
 	int centerX, centerY;
-	int bgColor=255;
+	int bgColor=0;
 	PImage s;
 	Marquee m;
 	PFont f;
@@ -18,25 +18,25 @@ public class LEDMarquee extends PApplet {
 	  textBufferWidth=width*2;
 	  textBuffer=createGraphics(textBufferWidth,textBufferHeight); //Buffer to hold text
 	  centerX=width/2;
-	  centerY=height/2;
-	  m=new Marquee(5);
+	  centerY=height/2			  ;
+	  stroke(255);
+	  m=new Marquee(8);
 	  
 	  f=loadFont("Consolas-48.vlw");
-	  //textFont(f,48);
 	  
+	  //Initialize Text Buffer
 	  textBuffer.beginDraw();
-
 	  //Render bounding box for debugging
 	  //textBuffer.stroke(128);
 	  //textBuffer.noFill();
 	  //textBuffer.rect(0,0,400,400);
 	  textBuffer.textFont(f,128);
 	  textBuffer.textAlign(LEFT,TOP);
-	  textBuffer.fill(0);
+	  textBuffer.fill(255);
 	  textBuffer.text("Testing",0,0);
 	  textBuffer.endDraw();
-	  imageMode(CORNER);
-
+	  imageMode(CORNER); //Only needed if rendering the text directly for debugging
+	  
 	}
 
 	int xy(int x, int y, int w)
@@ -53,6 +53,7 @@ public class LEDMarquee extends PApplet {
 	{
 	  background(bgColor);
 	  m.draw();
+	  //image(textBuffer,0,0);
 
 	  //Test Light
 	  //  shapeMode(CENTER);
@@ -85,15 +86,33 @@ public class LEDMarquee extends PApplet {
 
 	  public void draw()
 	  {
-		  drawOff();
+		  //drawOff();
+		  int xy;
+		  textBuffer.loadPixels();
+		  
+		  //Return to beginning when scrolling is complete
 		  if(m.BufferOffsetX==textBufferWidth)
 		  {
 			  m.BufferOffsetX=0;
 		  }
-		  int xy=xy(x+m.BufferOffsetX,y+m.BufferOffsetY,textBufferWidth);
-		  textBuffer.loadPixels();
-
+		  
+		  //int AverageBrightness=0;
+		  //Compact way to build all permutations needed to scan all 8 neighbouring pixels + the centre one
+		  //for (int NeighbourX=-1;NeighbourX<=1;NeighbourX++)
+		  //{
+		//	  for (int NeighbourY=-1;NeighbourY<=1;NeighbourY++)
+			//  {
+				  xy=xy(x+m.BufferOffsetX,y+m.BufferOffsetY,textBufferWidth); //Get coinciding buffer pixel
+		//		  if (xy<textBuffer.pixels.length && xy>=0)
+		//		  {
+		//			  AverageBrightness+=textBuffer.pixels[xy]; //Sum the brightness values
+		//		  }
+		//	  }
+		 // }
+		  
+		  //Determine on/off. Ignore any buffer pixels that would fall outside the viewable area
 		  if (xy<textBuffer.pixels.length && textBuffer.pixels[xy]==0)
+		  //if (AverageBrightness > 0)
 		  {
 			  drawOn();
 		  }
@@ -105,28 +124,22 @@ public class LEDMarquee extends PApplet {
 	  
 	  private void drawOn()
 	  {
-	    //pushStyle();
 	    pushMatrix();
 	    translate(x, y);
 	    fill(ColorOn);
 	    //shape(bulbOn, 0, 0);
 	    ellipse(0,0,size,size);
 	    popMatrix();
-	    //popStyle();
 	  }
 
 	  private void drawOff()
 	  {
-	    //pushStyle();
 	    pushMatrix();
 	    translate(x, y);
 	    fill(ColorOff);
-	    //println("x:"+x, "y:"+y);
 	    //shape(bulbOff, 0, 0);
 	    ellipse(0,0,size,size);
-	    //text(" ", 1, 1); //@#$%@#$@ Why NPE???
 	    popMatrix();
-	    //popStyle();
 	  }
 	}
 
@@ -178,19 +191,7 @@ public class LEDMarquee extends PApplet {
 	    //println("col:"+col, "totalBulbSpace:"+totalBulbSpace, "radius:"+radius);
 	    return col*totalBulbSpace + bulbSize;//+radius;
 	  }
-	  
-	  /*
-	  public int BufferOffsetX()
-	  {
-		  return 0;
-	  
-	  }
-	  public int BufferOffsetY()
-	  {
-		  return 0;
-	  }
-	  */
-	  
+	  	  
 	  void draw()
 	  {
 	    //pushMatrix();
@@ -199,26 +200,7 @@ public class LEDMarquee extends PApplet {
 	      for (int y=0;y<rows;y++)
 	      {
 	        //println("x:"+x, "y:"+y);
-	    	//marqueeGrid[x][y].drawOff();
-	    	//v=Vxy
-	    	  //if (textBuffer.pixels[])
-
-	    	//TODO: Key question: Given a pixel x,y where the Font exists, which bulb should light?
-	    	  //Need conversion function from x to bulb X in grid
-	    	//Solution: Make text buffer available to bulbs. When they render, they check if they coincide with the textBuffer's location and locally decide to turn on or off
-	    	  
 	    	marqueeGrid[x][y].draw();
-	    	
-	    	/*
-	        if (noise(x+y) >= 0.5)
-	        {
-	          marqueeGrid[x][y].drawOff();
-	        }
-	        else
-	        {
-	          marqueeGrid[x][y].drawOn();
-	        }
-	        */
 	      }
 	    }
 	    BufferOffsetX+=bulbSize; //Scroll
@@ -226,6 +208,7 @@ public class LEDMarquee extends PApplet {
 	  }
 	}
 
+	/*
 	public void mouseMoved()
 	{
 	  int x=mouseX;
@@ -233,6 +216,7 @@ public class LEDMarquee extends PApplet {
 	  //int xy=x+(y*width);
 	 // println(x, y);
 	}
+	*/
 
 	public static void main(String _args[]) {
 		PApplet.main(new String[] { ledmarquee.LEDMarquee.class.getName() });
