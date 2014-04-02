@@ -1,29 +1,31 @@
 package ledmarquee;
 import processing.core.*;
+
 public class Main extends PApplet
 {
 	//Global
 	int bgColor=0;
-	Marquee m;
 	Bulb bulb;
-	PFont font; 
-	int textBufferWidth;
-	int textBufferHeight;
-
+	Marquee marquee;
+	MarqueeText marqueeText;
+	
 	public void setup()
 	{
-	  size(500, 200);
+	  size(500, 500);
+	  frameRate(4);
+	  bulb = new Bulb(this, 10);
+	  marquee = new Marquee(this, 0, 0, width, height, bulb, 2);
 	  
-	  font = createFont("Times New Roman", 20);
-	  bulb = new Bulb(this, 8);
-	  m    = new Marquee(this, 0, 0, width, height * 2, bulb, font, 1);
+	  marqueeText = new MarqueeText(this);
+	  marqueeText.setText();
+	  marquee.addText(marqueeText);
 	  
 	}
 
 	public void draw()
 	{
 		background(bgColor);
-		m.update(); 
+		marquee.update(); 
 		
 	}
 

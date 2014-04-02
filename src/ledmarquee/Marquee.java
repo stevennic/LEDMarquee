@@ -1,6 +1,5 @@
 package ledmarquee;
 
-
 import processing.core.*;
 
 public class Marquee
@@ -12,56 +11,53 @@ public class Marquee
 	private int bulbSize; 
 	private int rowOfBulbs;
 	private int colOfBulbs;
-	private int bulbSeparation;
 	private Bulb [][] marqueeGrid;
-	private int bufferOffsetX;
-	private int bufferOffsetY;
-	
-	private PGraphics textBuffer;
-	private int textBufferWidth;
-	private int textBufferHeight;
-	PFont font;
+	private int bulbSeparation;
 	int x, y;
+	private PGraphics backgroundBuffer;
+	private Bulb bulb;
+	private MarqueeText marqueeText;
+	private int bufferOffsetX = 0;
+	private int bufferOffsetY = 0;
 	
 	Marquee(PApplet parent,
-			int		x,
-			int		y,
-			int     marqueeWidth,
-			int     marqueeHeight,
-			Bulb    bulb,
-			PFont   font,
-			int separation)
+			int	x, int y,
+			int marqueeWidth,
+			int marqueeHeight,
+			Bulb bulb,
+			int bulbSeparation)
 	{
 		p = parent;
-		this.x 				= x;
-		this.y				= y;
-		this.bulbSize       = bulb.size;
-		this.bulbSeparation = separation;
-		this.marqueeWidth     = marqueeWidth;
-		this.marqueeHeight    = marqueeHeight;
-		this.font 			  = font;
+		this.x = x;
+		this.y = y;
+		this.bulbSize = bulb.size;
+		this.marqueeWidth = marqueeWidth;
+		this.marqueeHeight = marqueeHeight;
+		this.bulbSeparation = bulbSeparation;
+		this.bulb = bulb;
+		this.bufferOffsetX = 0;
+		this.bufferOffsetY = 0;
 		
-		bufferOffsetX = 0;
-		bufferOffsetY = 0;
-		
+		createMarqueeBackground(); 
+		createMarqueeArray(); 
+	}
+	
+	private void createMarqueeBackground() {
+		backgroundBuffer = p.createGraphics(marqueeWidth, marqueeHeight); 
+		backgroundBuffer.beginDraw();
+		for(int i = 0; i < marqueeWidth; i = i + bulbSize + bulbSeparation)
+		{
+			for(int j = 0; j < marqueeWidth; j = j + bulbSize + bulbSeparation)
+			{
+				backgroundBuffer.ellipse(i, j, bulbSize, bulbSize);
+			}
+		}
+		backgroundBuffer.endDraw();	
+	}
+	
+	private void createMarqueeArray() {
 		rowOfBulbs = (int)Math.floor(marqueeHeight / (bulbSize + bulbSeparation));
 		colOfBulbs = (int)Math.floor(marqueeWidth  / (bulbSize + bulbSeparation));
-		
-		
-		////From MAIN
-		textBufferHeight = p.height;
-		textBufferWidth  = p.width * 2;
-		textBuffer=p.createGraphics(textBufferWidth,textBufferHeight); //Buffer to hold text
-		p.stroke(255);
-
-		//Initialize Text Buffer
-		textBuffer.beginDraw();
-		textBuffer.textFont(font);
-		textBuffer.textAlign(p.LEFT,p.TOP);
-		textBuffer.fill(255);
-		textBuffer.text("Testing",0,0);
-		textBuffer.endDraw();
-		p.imageMode(p.CORNER); //Only needed if rendering the text directly for debugging
 		
 		marqueeGrid = new Bulb[colOfBulbs][rowOfBulbs];
 		for(int x1 = 0; x1 < colOfBulbs; x1++)
@@ -71,70 +67,10 @@ public class Marquee
 		      marqueeGrid[x1][y1] = new Bulb(bulb, convertToCoord(x1) + x, convertToCoord(y1) + y);
 		    }
 		}
-		
-		p.imageMode(p.CENTER);
-	
 	}
 	
-	
-	//Constructor
-	///////////////////////////////////////////////////////////////////////////////
-	/*Marquee(PApplet parent, 
-			int marqueeWidth,
-			int marqueeHeight,
-			int bulbSize,
-			int bulbSeparation)
-	{
-		
-		p = parent;
-		
-		this.bulbSize       = bulbSize;
-		this.bulbSeparation = bulbSeparation;
-		this.marqueeWidth     = marqueeWidth;
-		this.marqueeHeight    = marqueeHeight;
-				
-		bufferOffsetX = 0;
-		bufferOffsetY = 0;
-		
-		rowOfBulbs = (int)Math.floor(marqueeHeight / (bulbSize + bulbSeparation));
-		colOfBulbs = (int)Math.floor(marqueeWidth  / (bulbSize + bulbSeparation));
-		marqueeGrid = new Bulb[colOfBulbs][rowOfBulbs];
-		
-		////From MAIN
-		textBufferHeight = p.height;
-		textBufferWidth  = p.width*2;
-		textBuffer=p.createGraphics(textBufferWidth,textBufferHeight); //Buffer to hold text
-		p.stroke(255);
-
-		//f=p.loadFont("Consolas-48.vlw");
-		f = p.createFont("Times New Roman", 20); //Just to see if this would work here.
-		
-		//Initialize Text Buffer
-		textBuffer.beginDraw();
-		textBuffer.textFont(f);
-		textBuffer.textAlign(p.LEFT,p.TOP);
-		textBuffer.fill(255);
-		textBuffer.text("Testing",0,0);
-		textBuffer.endDraw();
-		p.imageMode(p.CORNER); //Only needed if rendering the text directly for debugging
-		
-		for(int x = 0; x < colOfBulbs; x++)
-		{
-		    for (int y = 0; y < rowOfBulbs; y++)
-		    {
-		      marqueeGrid[x][y] = new Bulb(p, bulbSize, convertToCoord(x), convertToCoord(y));
-		    }
-		}
-		
-		p.imageMode(p.CENTER);
-	}*/
-	
-	
-	private void initializeBuffer()
-	{
-		textBufferHeight = p.height;
-		textBufferWidth  = p.width * 2;
-		textBuffer       = p.createGraphics(textBufferWidth,textBufferHeight); //Buffer to hold text
+	public void addText(MarqueeText marqueeText) {
+		this.marqueeText = marqueeText;
 	}
 	
 	private int convertToCoord(int var)
@@ -147,37 +83,41 @@ public class Marquee
 	  return x + (y * w); //Map 2 dimensions to 1-D array
 	} 
 	
+	
+	public void drawBackground() {
+		p.image(backgroundBuffer, x, y); 
+	}
+	
+	
 	public void update()
 	{
-		
-		for (int x = 0; x < colOfBulbs; x++) {
-			for (int y = 0;y< rowOfBulbs; y++) {
-				int xy = convertToIndex(x + bufferOffsetX, 
-										y + bufferOffsetY,
-									    textBufferWidth); //Get coinciding buffer pixel
-				
-				
-				//textBuffer.loadPixels(); <--- This was causing the slowdown
-
-				//Return to beginning when scrolling is complete
-				if(bufferOffsetX > textBufferWidth / bulbSize)
+		drawBackground();
+		if(marqueeText != null) {
+			for (int x = 0; x < colOfBulbs; x++)
+			{
+				for (int y = 0;y< rowOfBulbs; y++)
 				{
-					bufferOffsetX = 0;
-				}
-
-				//Determine on/off. Ignore any buffer pixels that would fall outside the viewable area
-				if (xy < textBuffer.pixels.length && textBuffer.pixels[xy] == 0)
-					//if (AverageBrightness > 0)
-				{
-					marqueeGrid[x][y].drawOn();
-				}
-				else
-				{
-					marqueeGrid[x][y].drawOff();
+					int xy = convertToIndex(x + bufferOffsetX, y + bufferOffsetY, marqueeText.textBufferWidth); 
+					
+					//Return to beginning when scrolling is complete
+					if(bufferOffsetX > marqueeText.textBufferWidth / bulbSize)
+					{
+						bufferOffsetX = 0;
+					}
+	
+					//Determine on/off. Ignore any buffer pixels that would fall outside the viewable area
+					if (xy < marqueeText.textBuffer.pixels.length && marqueeText.textBuffer.pixels[xy] == 0)
+					{
+						marqueeGrid[x][y].drawOn();
+					}
+					else
+					{
+						marqueeGrid[x][y].drawOff();
+					}
 				}
 			}
+			bufferOffsetX += bulbSize; 
 		}
-		bufferOffsetX += bulbSize; 
 	}
 	
 }
