@@ -22,12 +22,14 @@ public class Bulb
 		height = bulbOn.height;
 	}
 
-	Bulb(Bulb bulb) {
+	Bulb(Bulb bulb)
+	{
 		bulbOn = bulb.bulbOn;
 		bulbOff = bulb.bulbOff;
 	}
 
-	void setLocation(float x, float y) {
+	void setLocation(float x, float y)
+	{
 		this.x = x;
 		this.y = y;
 	}
