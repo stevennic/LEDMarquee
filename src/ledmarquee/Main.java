@@ -6,27 +6,26 @@ public class Main extends PApplet
 	//Global
 	int bgColor=0;
 	Bulb bulb;
-	Marquee marquee;
-	MarqueeText marqueeText;
+	LEDSurface ledSurface;
+	LEDObject ledObject;
+	LEDAnimation ledAnimation;
 	
 	public void setup()
 	{
 	  size(500, 500);
-	  frameRate(4);
-	  bulb = new Bulb(this, 10);
-	  marquee = new Marquee(this, 0, 0, width, height, bulb, 2);
 	  
-	  marqueeText = new MarqueeText(this);
-	  marqueeText.setText();
-	  marquee.addText(marqueeText);
+	  bulb = new Bulb(this, loadImage("on.png"), loadImage("off.png"));
+	  ledObject = new LEDObject();
+	  ledAnimation = new LEDAnimation(ledObject, new Vector(0, 0), new Vector(0.1, 0.1));
+	  ledSurface = new LEDSurface(this, bulb, new Vector(100, 100), 20, 20);
+	  ledSurface.addAnimation(ledAnimation);
 	  
 	}
 
 	public void draw()
 	{
-		background(bgColor);
-		marquee.update(); 
-		
+		background(255);
+		ledSurface.drawSurface();
 	}
 
 	public static void main(String _args[])

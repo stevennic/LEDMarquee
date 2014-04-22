@@ -3,50 +3,36 @@ import processing.core.*;
 
 public class Bulb
 {
-	int x, y, size;
+	float x, y, size;
 	int ColorOn = 0;
 	int ColorOff = 255;
 	PApplet p;
-	PGraphics bulbGraphicOn;
-	PGraphics bulbGraphicOff;
+	PImage bulbOn;
+	PImage bulbOff;
 	int fadeOutTime; 
+	int height, width;
 	
 	//Setting the bulb to start
-	Bulb(PApplet parent, int size)
+	Bulb(PApplet parent, PImage bulbOn, PImage bulbOff)
 	{
 		this.p = parent;
-		this.size = size;
+		this.bulbOn = bulbOn;
+		this.bulbOff = bulbOff;
+		width = bulbOn.width;
+		height = bulbOn.height;
 	}
 
-	
-	//Copy constructor for the single bulb used by the
-	//Marquee to place on the 
-	Bulb(Bulb copy, int x, int y)
-	{
-		this.p = copy.p;
-		this.size = copy.size;
+	Bulb(Bulb bulb) {
+		bulbOn = bulb.bulbOn;
+		bulbOff = bulb.bulbOff;
+	}
+
+	void setLocation(float x, float y) {
 		this.x = x;
 		this.y = y;
 	}
 	
-	
-	public void drawOn()
-	{
-		p.pushMatrix();
-		p.translate(x, y);
-		p.fill(ColorOn);
-		p.ellipse(0,0,size,size);
-		p.popMatrix();
-	}
 
-	public void drawOff()
-	{
-		p.pushMatrix();
-		p.translate(x, y);
-		p.fill(ColorOff);
-		p.ellipse(0,0,size,size);
-		p.popMatrix();
-	}
 }
 
 
