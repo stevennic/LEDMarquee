@@ -9,6 +9,9 @@ public class LEDObject {
 	LEDObject() {
 		onOffArray = new ArrayList<Vector>();
 		
+	}
+	
+	void testSet() {
 		Random rnd = new Random();
 		for(int row = 0; row < 5; row++) {
 			for(int col = 0; col < 5; col++) {
