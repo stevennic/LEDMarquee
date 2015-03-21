@@ -1,88 +1,90 @@
 package ledmarquee;
-import java.util.ArrayList;
 
 import processing.core.PApplet;
+import processing.core.PVector;
+
+import java.util.ArrayList;
 
 public class LEDSurface
 {
-	ArrayList<LEDAnimation> ledAnimations; 
-	Vector location;
-	Bulb [][] bulbs;
-	int width, height; 
-	PApplet p; 
-	
-	LEDSurface(PApplet p, Bulb bulb, Vector location, int width, int height)
-	{
-		this.p = p;
-		this.location = location;
-		this.width = width;
-		this.height = height;
-		ledAnimations = new ArrayList<LEDAnimation>();
-		buildSurface(bulb, width, height); 
-	}
-	
-	void buildSurface(Bulb bulb, int width, int height)
-	{
-		bulbs = new Bulb[width][height];
-		float xLoc, yLoc; 
-		for(int row = 0; row < height; row++)
-		{
-			for(int col = 0; col < width; col++)
-			{
-				xLoc = (col * bulb.width);
-				yLoc = (row * bulb.height);
-				bulbs[col][row] = new Bulb(bulb);
-				bulbs[col][row].setLocation(xLoc, yLoc);
-			}
-		}
-	}
-	
-	void drawSurface()
-	{
-		drawBackground(); 
-		drawAnimations();
-	}
-	
-	void drawBackground()
-	{
-		for(int row = 0; row < height; row++)
-		{
-			for(int col = 0; col < width; col++)
-				p.image(bulbs[col][row].bulbOff, bulbs[col][row].x + location.x, bulbs[col][row].y + location.y);
-		}
-	}
-	
-	void drawAnimations()
-	{
-		int x, y; 
-		for(LEDAnimation animation : ledAnimations)
-		{
-			animation.update();
-			
-			for(Vector ledVector : animation.ledObject.onOffArray)
-			{
-				if(onSurface(ledVector))
-				{
-					x = (int)ledVector.x;
-					y = (int)ledVector.y;
-					p.image(bulbs[x][y].bulbOn, bulbs[x][y].x + location.x, bulbs[x][y].y + location.y);
-				}
-					
-			}
-		}
-	}
-	
-	boolean onSurface(Vector vector)
-	{
-		if(vector.x >= 0 && vector.x < width)
-			if(vector.y >= 0 && vector.y < height)
-				return true;
-		return false;
-	}
-	
-	void addAnimation(LEDAnimation animation)
-	{
-		ledAnimations.add(animation);
-	}
-	
+    ArrayList<LEDAnimation> ledAnimations;
+    PVector origin; //Relative position of LEDSurface on canvas
+    Bulb[][] bulbs;
+    int xBulbs, yBulbs; //Number of bulb columns and rows
+    PApplet p;
+
+    LEDSurface(PApplet p, PVector location)
+    {
+        this.p = p;
+        this.origin = location;
+        this.xBulbs = p.width / Bulb.getWidth();
+        this.yBulbs = p.height / Bulb.getHeight();
+        ledAnimations = new ArrayList<LEDAnimation>();
+        buildSurface(xBulbs, yBulbs);
+    }
+
+    void buildSurface(int xBulbs, int yBulbs)
+    {
+        bulbs = new Bulb[xBulbs][yBulbs];
+        float xLoc, yLoc;
+        for (int row = 0; row < yBulbs; row++)
+        {
+            for (int col = 0; col < xBulbs; col++)
+            {
+                //Calculate bulb's physical location
+                xLoc = (col * Bulb.getWidth());
+                yLoc = (row * Bulb.getHeight());
+                Bulb b = new Bulb(p);
+                b.setLocation(xLoc, yLoc);
+                bulbs[col][row] = b;
+            }
+        }
+    }
+
+    void drawSurface()
+    {
+        //Turn all bulbs off
+        for (Bulb[] bulbRows : bulbs)
+        {
+            for (Bulb bulb : bulbRows)
+                bulb.TurnOff();
+        }
+
+        //Turn selective bulbs on
+        for (LEDAnimation animation : ledAnimations)
+        {
+            animation.Move();
+
+            for (Vector v : animation.ledObject.onOffArray)
+            {
+                int x = (int) (origin.x + v.x + animation.offset.x);
+                int y = (int) (origin.y + v.y + animation.offset.y);
+                if (x < xBulbs && x >= 0 && y < yBulbs && y >= 0)
+                {
+                    bulbs[x][y].TurnOn();
+                }
+            }
+        }
+
+        //Render all bulbs
+        for (Bulb[] bulbRows : bulbs)
+        {
+            for (Bulb bulb : bulbRows)
+                bulb.Render();
+        }
+    }
+
+    boolean onSurface(PVector vector)
+    {
+        if (vector.x >= 0 && vector.x < xBulbs)
+            if (vector.y >= 0 && vector.y < yBulbs)
+                return true;
+        return false;
+    }
+
+    void addAnimation(LEDAnimation animation)
+    {
+        animation.surface = this;
+        ledAnimations.add(animation);
+    }
 }

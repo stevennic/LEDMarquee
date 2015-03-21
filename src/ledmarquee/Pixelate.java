@@ -35,7 +35,10 @@ NOTE: All returns methods return int return as the Processing representation of 
 */
 
 
-import processing.core.*; 
+import processing.core.PApplet;
+import processing.core.PFont;
+import processing.core.PGraphics;
+import processing.core.PImage;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -46,7 +49,6 @@ class Pixelate {
   
   Pixelate(PApplet p) {
     parent = p;
-    
   }
   
    //Converts a string into array of RGB color - Not given a resolution so 
