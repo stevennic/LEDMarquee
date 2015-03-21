@@ -327,8 +327,5 @@ class Pixelate {
     
     return pgBuffer;
   }
-  
- 
-  
 }//End of Class
 

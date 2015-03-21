@@ -15,26 +15,12 @@ public class Bulb
     private static int height, width;
     boolean on = false;
 
-    //Setting the bulb to start
-    Bulb(PApplet parent) //, PImage bulbOn, PImage bulbOff)
+    Bulb(PApplet parent)
     {
         this.p = parent;
         on = false;
-        /*
-        this.bulbOn = bulbOn;
-		this.bulbOff = bulbOff;
-		*/
     }
-
-	/*
-    Bulb()//Bulb bulb)
-	{
-
-		bulbOn = bulb.bulbOn;
-		bulbOff = bulb.bulbOff;
-	}
-	*/
-
+    
     public static void SetImages(PImage _bulbOn, PImage _bulbOff)
     {
         bulbOn = _bulbOn;

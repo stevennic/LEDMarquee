@@ -6,7 +6,6 @@ import processing.core.PVector;
 public class Main extends PApplet
 {
     //Global
-    //Bulb bulb;
     LEDSurface ledSurface;
     LEDObject ledObject;
     LEDAnimation ledAnimation1, ledAnimation2;
@@ -15,7 +14,6 @@ public class Main extends PApplet
     public void setup()
     {
         size(1000, 500);
-        //bulb = new Bulb(this);
 
         Bulb.SetImages(loadImage("on2.png"), loadImage("off2.png"));
         ledSurface = new LEDSurface(this, new PVector(0, 0));

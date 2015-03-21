@@ -32,7 +32,6 @@ public class LEDAnimation
             {
                 offset.y = -ledObject.getMaxY();
             }
-
         }
     }
 }

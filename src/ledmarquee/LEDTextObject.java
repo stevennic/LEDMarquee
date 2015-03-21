@@ -2,7 +2,6 @@ package ledmarquee;
 
 import processing.core.PApplet;
 import processing.core.PFont;
-//import processing.
 
 public class LEDTextObject extends LEDObject
 {
